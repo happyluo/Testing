@@ -30,22 +30,6 @@ public:
 		return instance;
 	}
 
-//	void InitializeRegisteredTestSuite()
-//	{
-//#if 0
-//		for (std::vector<RegisterFunction>::iterator iter = m_AllRegisterFunction.begin(); 
-//			iter != m_AllRegisterFunction.end(); ++iter)
-//		{
-//			(*iter)();
-//		}
-//#else
-//		for (size_t i = 0; i < m_AllRegisterFunction.size(); ++i)
-//		{
-//			m_AllRegisterFunction[i]();
-//		}
-//#endif
-//	}
-	
 	void RunAllTest()
 	{
 		for (std::list<TestBasePtr>::const_iterator iter = m_AllTests.begin(); 
@@ -62,15 +46,8 @@ public:
 		return testInstance;
 	}
 
-	//void RegistFunc(RegisterFunction regfun) 
-	//{
-	//	m_AllRegisterFunction.push_back(regfun);											
-	//	return;
-	//}
-
 private:
 	std::list<TestBasePtr> m_AllTests;
-	//std::vector<RegisterFunction> m_AllRegisterFunction;
 };
 
 
@@ -100,10 +77,6 @@ private:
 #define TEST_F(TestCaseName, TestName) \
 	TEST_IMPL(TestCaseName, TestName, TestCaseName)
 	
-
-
-//#define INIT_TEST_SUITE()	\
-//	(::TestSuite::GetInstance()->InitializeRegisteredTestSuite())
 
 #define RUN_ALL_TESTS()		\
 	(TESTING TestSuite::GetInstance()->RunAllTest())

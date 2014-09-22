@@ -15,7 +15,6 @@
 
 #include <Build/BuildConfig.h>
 #include <Build/UsefulMacros.h>
-//#include <Util/Port.h>
 
 //
 // Some include files we need almost everywhere.
@@ -71,14 +70,12 @@ enum MutexProtocol
 //
 // Calculate current CPU's endianness
 //
-/// 字节序枚举
 enum EndianType
 {
 	BigEndian = 0,		//BigEndian
 	LittleEndian,		//LittleEndian
 };
 
-/// 判断当前主机是否是Big Endian
 /*static */inline bool IsBigEndian() 
 {
 #ifdef BIG_ENDIAN
@@ -92,7 +89,6 @@ enum EndianType
 	return 0 == cValue;
 }
 
-/// 判断当前主机(Machine)是否是Big Endian
 /*static */inline EndianType CurrentEndian()
 {
 #ifdef BIG_ENDIAN
@@ -196,7 +192,7 @@ private:
 
 typedef unsigned char			Byte;
 typedef short					Short;
-typedef int					Int;
+typedef int						Int;
 typedef Util::Int64				Long;
 typedef float					Float;
 typedef double					Double;
@@ -217,12 +213,6 @@ typedef std::vector<Float>			FloatSeq;
 typedef std::vector<Double>			DoubleSeq;
 // A sequence of strings. 
 typedef std::vector<std::string>	StringSeq;
-
-// A sequence of objects. 
-//typedef std::vector<Object>		ObjectSeq;
-
-// A sequence of object proxies. 
-//typedef std::vector<Object*>		ObjectProxySeq;
 
 }
 

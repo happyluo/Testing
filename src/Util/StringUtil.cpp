@@ -28,11 +28,11 @@
 #	include <inttypes.h>
 #endif
 
-#include <Util/StringUtil.h>
-#include <Unicoder/StringConverter.h>
 #include <Build/UndefSysMacros.h>
-#include <Util/ScopedArray.h>
 #include <Build/UsefulMacros.h>
+#include <Util/ScopedArray.h>
+#include <Util/StringUtil.h>
+#include <Util/Exception.h>
 
 //#ifdef OS_WINRT
 //#	include <Util/ScopedArray.h>
@@ -76,54 +76,6 @@ String::String(const std::string& src) : std::string(src)
 
 String::~String()
 {
-}
-
-String String::ToUTF8(const std::string& internalCode) const
-{
-	StringConverterPtr stringConverter = "local" == internalCode ?
-#	if defined(_WIN32) && !defined(ICONV_ON_WINDOWS)
-		new WindowsStringConverter() : new WindowsStringConverter(internalCode);
-#	else
-		new IconvStringConverter<char>() : new IconvStringConverter<char>(internalCode.c_str());
-#	endif
-
-	return Util::NativeToUTF8(stringConverter, *this);
-}
-
-String String::ToUTF8(const String& src, const std::string& internalCode)
-{
-	StringConverterPtr stringConverter = "local" == internalCode ?
-#	if defined(_WIN32) && !defined(ICONV_ON_WINDOWS)
-		new WindowsStringConverter() : new WindowsStringConverter(internalCode);
-#	else
-		new IconvStringConverter<char>() : new IconvStringConverter<char>(internalCode.c_str());
-#	endif
-
-	return Util::NativeToUTF8(stringConverter, src);
-}
-
-std::wstring String::ToWString(const std::string& internalCode) const
-{
-	StringConverterPtr stringConverter = "local" == internalCode ?
-#	if defined(_WIN32) && !defined(ICONV_ON_WINDOWS)
-		new WindowsStringConverter() : new WindowsStringConverter(internalCode);
-#	else
-		new IconvStringConverter<char>() : new IconvStringConverter<char>(internalCode.c_str());
-#	endif
-
-	return Util::StringToWstring(Util::NativeToUTF8(stringConverter, *this));
-}
-
-std::wstring String::ToWString(const String& src, const std::string& internalCode)
-{
-	StringConverterPtr stringConverter = "local" == internalCode ?
-#	if defined(_WIN32) && !defined(ICONV_ON_WINDOWS)
-		new WindowsStringConverter() : new WindowsStringConverter(internalCode);
-#	else
-		new IconvStringConverter<char>() : new IconvStringConverter<char>(internalCode.c_str());
-#	endif
-
-	return Util::StringToWstring(Util::NativeToUTF8(stringConverter, src));
 }
 
 #ifdef _WIN32
@@ -736,64 +688,6 @@ String::TranslatingCR2LF(const std::string& src)
 	return result;
 }
 
-//std::string 
-//String::ToHexString(unsigned long n, bool bupper)
-//{
-//	string s;
-//	size_t size = sizeof(unsigned long) * 2;
-//	s.resize(size);
-//	string::size_type charPos = size;
-//	
-//	const int radix = 1 << 4;
-//	int mask = radix - 1;
-//	char base = bupper ? 'A' : 'a';
-//
-//	do
-//	{
-//		int d = n & mask;
-//		s[--charPos] = d < 10 ? '0' + d : base + (d - 10);
-//		n >>= 4;
-//	}while (0 != n);
-//
-//	return string(s, charPos, (size - charPos));
-//}
-
-//std::string 
-//String::ToOctalString(unsigned long n)
-//{
-//	string s;
-//	size_t size = sizeof(unsigned long) * 8;
-//	s.resize(size);
-//	string::size_type charPos = size;
-//	const int radix = 1 << 3;
-//	int mask = radix - 1;
-//	do
-//	{
-//		s[--charPos] = '0' + static_cast<int>(n & mask);
-//		n >>= 3;
-//	}while (0 != n);
-//
-//	return string(s, charPos, (size - charPos));
-//}
-
-//std::string 
-//String::ToBinaryString(unsigned long n)
-//{
-//	string s;
-//	size_t size = sizeof(unsigned long) * 8;
-//	s.resize(size);
-//	string::size_type charPos = size;
-//
-//	do
-//	{
-//		//s[--charPos] = n & 1 ? '1' : '0';
-//		s[--charPos] = (n & 1) + '0';
-//		n >>= 1;
-//	}while (0 != n);
-//
-//	return string(s, charPos, (size - charPos));
-//}
-
 std::string
 String::ToLower(const std::string& s)
 {
@@ -1251,46 +1145,6 @@ String::ToDouble(const std::string& strval, size_t* endindex, int precision)
 	result *= ::pow(10.0, exp);
 
 	return sign * result;
-
-	//////////////////////////////////////////////////////////////////////////
-	//double integerpart = 0;
-	//double decimalpart = 0;
-	//std::string::const_pointer dot = 0;
-	//
-	//for (; *iter; ++iter)
-	//{
-	//	if (isdigit(*iter))
-	//	{
-	//		if (!dot)
-	//		{
-	//			integerpart = integerpart * 10 + *iter - '0';
-	//		}
-	//		else if (0 != precision)
-	//		{
-	//			--precision;
-	//			decimalpart = decimalpart + (*iter - '0') * ::pow(10., dot - iter);
-	//		}
-	//	}
-	//	else if (!dot && '.' == *iter)
-	//	{
-	//		dot = iter;
-	//	}
-	//	else if ('E' == toupper(*iter))
-	//	{
-	//		return sign * (integerpart + decimalpart) * ::pow(10., ToLong(strval.substr(iter - strval.c_str() + 1)));
-	//	}
-	//	else
-	//	{
-	//		break;
-	//	}
-	//}
-
-	//if (endindex)
-	//{
-	//	*endindex = iter - strval.c_str();
-	//}
-
-	//return sign * (integerpart + decimalpart);
 }
 
 std::string 
@@ -1337,94 +1191,6 @@ String::ToString(long n)
 	}
 
 	return string(s, charPos, (size - charPos));
-}
-
-/// 将双精度浮点型数转换为字符串，转换结果中不包括十进制小数点和符号位
-/// @param[in]		data				待转换的双精度浮点数。
-/// @param[in]		precision			转换的字符串中包含小数点后几位。
-/// @param[in]		data				小数点在返回的串中的位置(decimal point position)
-/// @param[in]		sign				转换的数的符号。
-std::string
-doubleConvert(double data, int precision, int& decpos, bool& negative)
-{
-	decpos = 0;
-	negative = false;
-
-	string strret;
-	size_t size = sizeof(double) * 8;
-	strret.resize(size);
-	string::size_type charPos = size;
-
-	negative = false;
-	if (data < 0)
-	{
-		data = -data;
-		negative = true;
-	}
-
-	double intprt;
-	data = modf(data, &intprt);
-
-	if (0 != intprt)
-	{
-		while (0 != intprt)
-		{
-			double decmprt = modf(intprt / 10, &intprt);
-			strret[--charPos] = static_cast<int>((decmprt + .03) * 10) + '0';
-			++decpos;
-		}
-		strret.erase(0, charPos).resize(size);
-	}
-	else
-	{
-		while (data * 10 < 1)
-		{
-			data *= 10;
-			--decpos;
-		}
-	}
-
-	int strretlen = precision + decpos;
-
-	if (strretlen < 0)
-	{
-		return "\0";
-	}
-
-	charPos = decpos > 0 ? decpos : 0;
-
-	while (static_cast<int>(charPos) <= strretlen)		// 为了保证正确舍入，需多插入一个尾数
-	{
-		data *= 10;
-		data = modf(data, &intprt);
-		strret[charPos++] = static_cast<int>(intprt) + '0';
-	}
-
-	// 
-	// 以下执行舍入操作
-	// 
-	strret[--charPos] += 5;		// 取最后一个尾数，检测其是否大于 5 ， 执行舍入
-	while (precision > 0 && strret[charPos] > '9')
-	{
-		strret[charPos] = '0';
-		if (charPos > 0)
-		{
-			++strret[--charPos];
-		}
-		else
-		{
-			//strret.insert(strret.begin(), '1');
-			++decpos;
-			strret[charPos] = '1';
-
-			++strretlen;
-			break;
-		}
-	}
-
-	strret.erase(strretlen);
-
-	return strret;
 }
 
 bool 
@@ -1642,39 +1408,6 @@ String::FindStringInBuffer(Util::Byte* buffer, size_t buffsize, const std::strin
 	}
 
 	return NULL;
-
-	//
-	// wrong!!!!! BUG manufacturing!!!!!!!!!!!
-	// test FindStringInBuffer("ssstring", strlen("ssstring"), "sstring"); return NULL.
-	//
-	//for (size_t i = 0; i < buffsize; /* ... */)
-	//{
-	//	int matchlen = 0;
-
-	//	const char *strTem = strtosearch.c_str();
-
-	//	while (i < buffsize && '\0' != strTem)
-	//	{
-	//		if (buffer[i] == *strTem)
-	//		{
-	//			++strTem;
-	//			++matchlen;
-	//		}
-	//		else if (matchlen > 0)
-	//		{
-	//			break;
-	//		}
-
-	//		++i;		// bug manufacturing.
-	//	}
-
-	//	if (matchlen == strtosearch.length())
-	//	{
-	//		return buffer + i - matchlen;
-	//	}
-	//}
-
-	//return NULL;
 }
 
 string 
@@ -1909,7 +1642,6 @@ String::HexStringToBuffer(const string &hexString, string &buffer, const std::st
 			data += 2;
 		}
 
-#if 1
 		string item;
 		item.reserve(128);		// for performance
 		while (*data && isxdigit(*data))
@@ -1938,27 +1670,6 @@ String::HexStringToBuffer(const string &hexString, string &buffer, const std::st
 
 			citer += 2;
 		}
-
-		//////////////////////////////////////////////////////////////////////////
-#else	// bug manufacture
-		//
-		//string::const_pointer end = hexString.c_str() + hexString.size();
-		//size_t len = end - data <= 2 ? end - data : 2;
-		//string strData(data, len);
-		//data += len;
-		//if ("0x" == ToLower(strData))
-		//{
-		//	continue;
-		//}
-		//else
-		//{
-		//	unsigned char cdata;
-		//	//std::stringstream ostringstream(strData);
-		//	//ostringstream >> std::hex >> cdata;
-		//	cdata = (unsigned char)ToULong(strData, 0, 16);
-		//	buffer += (sign * cdata);
-		//}
-#endif
 	}
 
 	return buffer;

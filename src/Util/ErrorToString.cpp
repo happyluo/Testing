@@ -7,7 +7,7 @@
 // **********************************************************************
 
 #include <Util/ErrorToString.h>
-#include <Unicoder/Unicode.h>
+#include <Util/StringUtil.h>
 
 UTIL_BEGIN
 
@@ -95,7 +95,7 @@ ErrorToString(int error, LPCVOID source)
 				LocalFree(msg);
 			}
 #endif
-			return Util::WstringToString(result);
+			return Util::WideStringToUtf8(result.c_str(), result.size());
 		}
 		else
 		{

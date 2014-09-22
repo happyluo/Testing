@@ -10,9 +10,8 @@
 #define UTIL_STRING_UTIL_H
 
 #include <string>
-//#include <vector>
-//#include <algorithm>
 #include <Util/Config.h>
+//#include <Util/StaticAssert.h>
 #include <Util/ErrorToString.h>
 
 UTIL_BEGIN
@@ -38,14 +37,6 @@ public:
 
 	template <class In> String(In pbegin, In pend);
 
-	String ToUTF8(const std::string& internalCode = "local") const;
-
-	static String ToUTF8(const String& src, const std::string& internalCode = "local");
-
-	std::wstring ToWString(const std::string& internalCode = "local") const;
-
-	static std::wstring ToWString(const String& src, const std::string& internalCode = "local");
-
 #ifdef _WIN32
 	// Creates a UTF-16 wide string from the given ANSI string, allocating
 	// memory using new. The caller is responsible for deleting the return
@@ -59,17 +50,6 @@ public:
 	// input is NULL.
 	static const char* UTF16ToAnsi(LPCWSTR utf16_str);
 #endif
-
-	//operator std::string&()
-	//{
-	//	return *this;
-	//}
-
-	//operator const std::string&() const
-	//{
-	//	return const_cast<const std::string&>(
-	//		const_cast<Util::String*>(this)->operator std::string&());
-	//}
 
 	//
 	// Add escape sequences (like "\n", or "\0xxx") to make a string
