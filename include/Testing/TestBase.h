@@ -19,21 +19,21 @@ public:
 class TESTING_API TestBase : public Util::Shared
 {
 public:
-	TestBase(const std::string& name);
-	virtual ~TestBase();
+    TestBase(const std::string& name);
+    virtual ~TestBase();
 
-	const std::string& Name() const;
+    const std::string& Name() const;
 
-	void Start();
+    void Start();
 
-	virtual void SetUp() {};
-	virtual void TearDown() {};
+    virtual void SetUp() {};
+    virtual void TearDown() {};
 
 protected:
 
-	virtual void Run() = 0;
+    virtual void Run() = 0;
 
-	const std::string m_name;
+    const std::string m_name;
 };
 
 typedef Util::SharedPtr<TestBase>  TestBasePtr;

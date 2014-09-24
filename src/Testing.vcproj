@@ -247,10 +247,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\include\Util\ScopedArray.h"
-					>
-				</File>
-				<File
 					RelativePath="..\include\Util\Shared.h"
 					>
 				</File>
@@ -274,6 +270,10 @@
 			<Filter
 				Name="Testing"
 				>
+				<File
+					RelativePath="..\include\Testing\ColorStream.h"
+					>
+				</File>
 				<File
 					RelativePath="..\include\Testing\Config.h"
 					>
